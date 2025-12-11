@@ -53,11 +53,7 @@ defmodule IngestProtocol do
 
   defmodule IngestError do
 
-    @type t ::
-      :invalid_schema #
-    | :invalid_event #
-    | :invalid_event_tag #
-    | :unknown_event_tag #
+    @type t :: :invalid_schema | :invalid_event | :invalid_event_tag | :unknown_event_tag
 
     defguard is_ingest_error(value) when value === :invalid_schema or value === :invalid_event or value === :invalid_event_tag or value === :unknown_event_tag
 
@@ -89,12 +85,7 @@ defmodule IngestProtocol do
 
   defmodule SchemaError do
 
-    @type t ::
-      :clashing_type #
-    | :unknown_type #
-    | :invalid_name #
-    | :invalid_type_definition #
-    | :update_failed #
+    @type t :: :clashing_type | :unknown_type | :invalid_name | :invalid_type_definition | :update_failed
 
     defguard is_schema_error(value) when value === :clashing_type or value === :unknown_type or value === :invalid_name or value === :invalid_type_definition or value === :update_failed
 
@@ -130,8 +121,7 @@ defmodule IngestProtocol do
 
   defmodule SchemaConflictError do
 
-    @type t ::
-      :dangerous_action #
+    @type t :: :dangerous_action
 
     defguard is_schema_conflict_error(value) when value === :dangerous_action
 

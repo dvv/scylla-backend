@@ -70,8 +70,7 @@ defmodule WebProtocol do
 
   defmodule LoginError do
 
-    @type t ::
-      :invalid_user_or_password # Invalid username or password
+    @type t :: :invalid_user_or_password
 
     defguard is_login_error(value) when value === :invalid_user_or_password
 
@@ -263,14 +262,7 @@ defmodule WebProtocol do
 
   defmodule ClickhouseInstanceError do
 
-    @type t ::
-      :invalid_code #
-    | :invalid_name #
-    | :invalid_uri #
-    | :invalid_username #
-    | :invalid_password #
-    | :code_already_exists #
-    | :name_already_exists #
+    @type t :: :invalid_code | :invalid_name | :invalid_uri | :invalid_username | :invalid_password | :code_already_exists | :name_already_exists
 
     defguard is_clickhouse_instance_error(value) when value === :invalid_code or value === :invalid_name or value === :invalid_uri or value === :invalid_username or value === :invalid_password or value === :code_already_exists or value === :name_already_exists
 
@@ -312,15 +304,44 @@ defmodule WebProtocol do
 
   end
 
-  defmodule Project do
+  defmodule ProjectEventValidation do
 
     @moduledoc """
     Projects
     """
+
+    @type t :: :strict | :none | :warn
+
+    defguard is_project_event_validation(value) when value === :strict or value === :none or value === :warn
+
+    @spec from_string!(String.t()) :: t()
+    def from_string!("strict"), do: :strict
+    def from_string!("none"), do: :none
+    def from_string!("warn"), do: :warn
+
+    @spec to_string!(t()) :: String.t()
+    def to_string!(:strict), do: "strict"
+    def to_string!(:none), do: "none"
+    def to_string!(:warn), do: "warn"
+
+    @spec from_json!(String.t()) :: t()
+    def from_json!("strict"), do: :strict
+    def from_json!("none"), do: :none
+    def from_json!("warn"), do: :warn
+
+    @spec to_json!(t()) :: String.t()
+    def to_json!(:strict), do: "strict"
+    def to_json!(:none), do: "none"
+    def to_json!(:warn), do: "warn"
+
+  end
+
+  defmodule Project do
+
     @enforce_keys [:id, :code, :name, :clickhouse_instance_id, :clickhouse_code, :clickhouse_name, :clickhouse_db, :key_su, :key_rw, :rev, :event_validation, :preserve_db_columns, :backup_mode, :created_at, :updated_at]
     defstruct [id: nil, code: nil, name: nil, clickhouse_instance_id: nil, clickhouse_code: nil, clickhouse_name: nil, clickhouse_db: nil, key_su: nil, key_rw: nil, description: nil, schema: "{}", rev: nil, event_validation: nil, preserve_db_columns: nil, backup_mode: nil, created_at: nil, updated_at: nil]
 
-    @type t :: %Project{id: integer, code: String.t(), name: String.t(), clickhouse_instance_id: integer, clickhouse_code: String.t(), clickhouse_name: String.t(), clickhouse_db: String.t(), key_su: String.t(), key_rw: String.t(), description: String.t() | nil, schema: TypesProtocol.project_schema(), rev: non_neg_integer, event_validation: boolean, preserve_db_columns: boolean, backup_mode: boolean, created_at: DateTime.t(), updated_at: DateTime.t()}
+    @type t :: %Project{id: integer, code: String.t(), name: String.t(), clickhouse_instance_id: integer, clickhouse_code: String.t(), clickhouse_name: String.t(), clickhouse_db: String.t(), key_su: String.t(), key_rw: String.t(), description: String.t() | nil, schema: TypesProtocol.project_schema(), rev: non_neg_integer, event_validation: WebProtocol.ProjectEventValidation.t(), preserve_db_columns: boolean, backup_mode: boolean, created_at: DateTime.t(), updated_at: DateTime.t()}
 
     @spec from_json!(Igor.Json.json()) :: t()
     def from_json!(json) do
@@ -336,7 +357,7 @@ defmodule WebProtocol do
       description = Igor.Json.parse_field!(json, "description", :string, nil)
       schema = Igor.Json.parse_field!(json, "schema", :string, "{}")
       rev = Igor.Json.parse_field!(json, "rev", :uint)
-      event_validation = Igor.Json.parse_field!(json, "event_validation", :boolean)
+      event_validation = Igor.Json.parse_field!(json, "event_validation", {:custom, WebProtocol.ProjectEventValidation})
       preserve_db_columns = Igor.Json.parse_field!(json, "preserve_db_columns", :boolean)
       backup_mode = Igor.Json.parse_field!(json, "backup_mode", :boolean)
       created_at = Igor.Json.parse_field!(json, "created_at", {:custom, Util.DateTime})
@@ -396,7 +417,7 @@ defmodule WebProtocol do
         |> Igor.Json.pack_field("description", description, :string)
         |> Igor.Json.pack_field("schema", schema, :string)
         |> Igor.Json.pack_field("rev", rev, :uint)
-        |> Igor.Json.pack_field("event_validation", event_validation, :boolean)
+        |> Igor.Json.pack_field("event_validation", event_validation, {:custom, WebProtocol.ProjectEventValidation})
         |> Igor.Json.pack_field("preserve_db_columns", preserve_db_columns, :boolean)
         |> Igor.Json.pack_field("backup_mode", backup_mode, :boolean)
         |> Igor.Json.pack_field("created_at", created_at, {:custom, Util.DateTime})
@@ -408,9 +429,9 @@ defmodule WebProtocol do
   defmodule CreateProjectRequest do
 
     @enforce_keys [:code, :name, :clickhouse_instance_id, :clickhouse_db]
-    defstruct [code: nil, name: nil, clickhouse_instance_id: nil, clickhouse_db: nil, description: nil, event_validation: true, preserve_db_columns: false, backup_mode: false]
+    defstruct [code: nil, name: nil, clickhouse_instance_id: nil, clickhouse_db: nil, description: nil, event_validation: :strict, preserve_db_columns: false, backup_mode: false]
 
-    @type t :: %CreateProjectRequest{code: String.t(), name: String.t(), clickhouse_instance_id: integer, clickhouse_db: String.t(), description: String.t() | nil, event_validation: boolean, preserve_db_columns: boolean, backup_mode: boolean}
+    @type t :: %CreateProjectRequest{code: String.t(), name: String.t(), clickhouse_instance_id: integer, clickhouse_db: String.t(), description: String.t() | nil, event_validation: WebProtocol.ProjectEventValidation.t(), preserve_db_columns: boolean, backup_mode: boolean}
 
     @spec from_json!(Igor.Json.json()) :: t()
     def from_json!(json) do
@@ -419,7 +440,7 @@ defmodule WebProtocol do
       clickhouse_instance_id = Igor.Json.parse_field!(json, "clickhouse_instance_id", :long)
       clickhouse_db = Igor.Json.parse_field!(json, "clickhouse_db", :string)
       description = Igor.Json.parse_field!(json, "description", :string, nil)
-      event_validation = Igor.Json.parse_field!(json, "event_validation", :boolean, true)
+      event_validation = Igor.Json.parse_field!(json, "event_validation", {:custom, WebProtocol.ProjectEventValidation}, :strict)
       preserve_db_columns = Igor.Json.parse_field!(json, "preserve_db_columns", :boolean, false)
       backup_mode = Igor.Json.parse_field!(json, "backup_mode", :boolean, false)
       %CreateProjectRequest{
@@ -452,7 +473,7 @@ defmodule WebProtocol do
         |> Igor.Json.pack_field("clickhouse_instance_id", clickhouse_instance_id, :long)
         |> Igor.Json.pack_field("clickhouse_db", clickhouse_db, :string)
         |> Igor.Json.pack_field("description", description, :string)
-        |> Igor.Json.pack_field("event_validation", event_validation, :boolean)
+        |> Igor.Json.pack_field("event_validation", event_validation, {:custom, WebProtocol.ProjectEventValidation})
         |> Igor.Json.pack_field("preserve_db_columns", preserve_db_columns, :boolean)
         |> Igor.Json.pack_field("backup_mode", backup_mode, :boolean)
     end
@@ -461,7 +482,7 @@ defmodule WebProtocol do
 
   defmodule UpdateProjectRequest do
 
-    @type t :: %{optional(:code) => String.t(), optional(:name) => String.t(), optional(:clickhouse_instance_id) => integer, optional(:clickhouse_db) => String.t(), optional(:description) => String.t(), optional(:event_validation) => boolean, optional(:preserve_db_columns) => boolean, optional(:backup_mode) => boolean}
+    @type t :: %{optional(:code) => String.t(), optional(:name) => String.t(), optional(:clickhouse_instance_id) => integer, optional(:clickhouse_db) => String.t(), optional(:description) => String.t(), optional(:event_validation) => WebProtocol.ProjectEventValidation.t(), optional(:preserve_db_columns) => boolean, optional(:backup_mode) => boolean}
 
     @spec from_json!(Igor.Json.json()) :: t()
     def from_json!(json) do
@@ -471,7 +492,7 @@ defmodule WebProtocol do
         |> field_from_json(json, "clickhouse_instance_id", :long, :clickhouse_instance_id)
         |> field_from_json(json, "clickhouse_db", :string, :clickhouse_db)
         |> field_from_json(json, "description", :string, :description)
-        |> field_from_json(json, "event_validation", :boolean, :event_validation)
+        |> field_from_json(json, "event_validation", {:custom, WebProtocol.ProjectEventValidation}, :event_validation)
         |> field_from_json(json, "preserve_db_columns", :boolean, :preserve_db_columns)
         |> field_from_json(json, "backup_mode", :boolean, :backup_mode)
     end
@@ -491,7 +512,7 @@ defmodule WebProtocol do
         |> field_to_json(args, :clickhouse_instance_id, :long, "clickhouse_instance_id")
         |> field_to_json(args, :clickhouse_db, :string, "clickhouse_db")
         |> field_to_json(args, :description, :string, "description")
-        |> field_to_json(args, :event_validation, :boolean, "event_validation")
+        |> field_to_json(args, :event_validation, {:custom, WebProtocol.ProjectEventValidation}, "event_validation")
         |> field_to_json(args, :preserve_db_columns, :boolean, "preserve_db_columns")
         |> field_to_json(args, :backup_mode, :boolean, "backup_mode")
     end
@@ -507,15 +528,7 @@ defmodule WebProtocol do
 
   defmodule ProjectError do
 
-    @type t ::
-      :invalid_code #
-    | :invalid_name #
-    | :invalid_clickhouse_instance_id #
-    | :invalid_clickhouse_db #
-    | :invalid_description #
-    | :clickhouse_instance_not_exists #
-    | :code_already_exists #
-    | :name_already_exists #
+    @type t :: :invalid_code | :invalid_name | :invalid_clickhouse_instance_id | :invalid_clickhouse_db | :invalid_description | :clickhouse_instance_not_exists | :code_already_exists | :name_already_exists
 
     defguard is_project_error(value) when value === :invalid_code or value === :invalid_name or value === :invalid_clickhouse_instance_id or value === :invalid_clickhouse_db or value === :invalid_description or value === :clickhouse_instance_not_exists or value === :code_already_exists or value === :name_already_exists
 
@@ -617,9 +630,7 @@ defmodule WebProtocol do
     Customer related items sort fields
     """
 
-    @type t ::
-      :id #
-    | :created_at #
+    @type t :: :id | :created_at
 
     defguard is_schema_migration_order_by(value) when value === :id or value === :created_at
 
@@ -647,10 +658,7 @@ defmodule WebProtocol do
     Backup columns sort fields
     """
 
-    @type t ::
-      :name #
-    | :field_name #
-    | :migration #
+    @type t :: :name | :field_name | :migration
 
     defguard is_backup_fields_order_by(value) when value === :name or value === :field_name or value === :migration
 
