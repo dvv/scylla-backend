@@ -124,7 +124,7 @@ defmodule WebProtocol.ScyllaManagementService do
     resource__ = "WebProtocol.ScyllaManagementService.CreateClickhouseInstance"
     try do
       api_key = Igor.Json.parse_field!(%{"x-api-key" => List.first(get_req_header(conn, "x-api-key"))}, "x-api-key", {:option, :string})
-      if get_req_header(conn, "content-type") != ["application/json"], do: raise Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'"
+      if get_req_header(conn, "content-type") != ["application/json"], do: raise(Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'")
       {:ok, body, conn} = read_body(conn)
       request_content = body
         |> Igor.Json.decode!()
@@ -144,7 +144,7 @@ defmodule WebProtocol.ScyllaManagementService do
       end
     rescue
       e in DataProtocol.BadRequestError ->
-        Logger.warn("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
+        Logger.warning("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
         body = e
           |> Igor.Exception.wrap()
           |> Igor.Json.pack_value({:custom, DataProtocol.BadRequestError, {{:custom, WebProtocol.ClickhouseInstanceError}}})
@@ -192,7 +192,7 @@ defmodule WebProtocol.ScyllaManagementService do
     try do
       id_or_code = Igor.Json.parse_field!(conn.path_params, "id_or_code", {:custom, Scylla.ClickhouseInstanceId})
       api_key = Igor.Json.parse_field!(%{"x-api-key" => List.first(get_req_header(conn, "x-api-key"))}, "x-api-key", {:option, :string})
-      if get_req_header(conn, "content-type") != ["application/json"], do: raise Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'"
+      if get_req_header(conn, "content-type") != ["application/json"], do: raise(Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'")
       {:ok, body, conn} = read_body(conn)
       request_content = body
         |> Igor.Json.decode!()
@@ -212,7 +212,7 @@ defmodule WebProtocol.ScyllaManagementService do
       end
     rescue
       e in DataProtocol.BadRequestError ->
-        Logger.warn("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
+        Logger.warning("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
         body = e
           |> Igor.Exception.wrap()
           |> Igor.Json.pack_value({:custom, DataProtocol.BadRequestError, {{:custom, WebProtocol.ClickhouseInstanceError}}})
@@ -282,7 +282,7 @@ defmodule WebProtocol.ScyllaManagementService do
     try do
       keep_db = Igor.Json.parse_field!(conn.query_params, "keep_db", :boolean, true)
       api_key = Igor.Json.parse_field!(%{"x-api-key" => List.first(get_req_header(conn, "x-api-key"))}, "x-api-key", {:option, :string})
-      if get_req_header(conn, "content-type") != ["application/json"], do: raise Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'"
+      if get_req_header(conn, "content-type") != ["application/json"], do: raise(Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'")
       {:ok, body, conn} = read_body(conn)
       request_content = body
         |> Igor.Json.decode!()
@@ -302,7 +302,7 @@ defmodule WebProtocol.ScyllaManagementService do
       end
     rescue
       e in DataProtocol.BadRequestError ->
-        Logger.warn("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
+        Logger.warning("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
         body = e
           |> Igor.Exception.wrap()
           |> Igor.Json.pack_value({:custom, DataProtocol.BadRequestError, {{:custom, WebProtocol.ProjectError}}})
@@ -351,7 +351,7 @@ defmodule WebProtocol.ScyllaManagementService do
       id_or_code = Igor.Json.parse_field!(conn.path_params, "id_or_code", {:custom, Scylla.ProjectId})
       keep_db = Igor.Json.parse_field!(conn.query_params, "keep_db", :boolean, true)
       api_key = Igor.Json.parse_field!(%{"x-api-key" => List.first(get_req_header(conn, "x-api-key"))}, "x-api-key", {:option, :string})
-      if get_req_header(conn, "content-type") != ["application/json"], do: raise Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'"
+      if get_req_header(conn, "content-type") != ["application/json"], do: raise(Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'")
       {:ok, body, conn} = read_body(conn)
       request_content = body
         |> Igor.Json.decode!()
@@ -371,7 +371,7 @@ defmodule WebProtocol.ScyllaManagementService do
       end
     rescue
       e in DataProtocol.BadRequestError ->
-        Logger.warn("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
+        Logger.warning("rpc_err: #{resource__}", data: %{exception: e}, domain: [:rpc])
         body = e
           |> Igor.Exception.wrap()
           |> Igor.Json.pack_value({:custom, DataProtocol.BadRequestError, {{:custom, WebProtocol.ProjectError}}})
@@ -417,7 +417,7 @@ defmodule WebProtocol.ScyllaManagementService do
       id_or_code = Igor.Json.parse_field!(conn.path_params, "id_or_code", {:custom, Scylla.ProjectId})
       key = Igor.Json.parse_field!(conn.path_params, "key", :atom)
       api_key = Igor.Json.parse_field!(%{"x-api-key" => List.first(get_req_header(conn, "x-api-key"))}, "x-api-key", {:option, :string})
-      if get_req_header(conn, "content-type") != ["application/json"], do: raise Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'"
+      if get_req_header(conn, "content-type") != ["application/json"], do: raise(Plug.BadRequestError, "The request must have header 'content-type' equal to 'application/json'")
       {:ok, body, conn} = read_body(conn)
       request_content = body
         |> Igor.Json.decode!()
