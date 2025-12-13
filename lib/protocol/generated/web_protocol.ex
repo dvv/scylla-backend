@@ -70,20 +70,24 @@ defmodule WebProtocol do
 
   defmodule LoginError do
 
-    @type t :: :invalid_user_or_password
+    @type t :: :invalid_data | :invalid_user_or_password
 
-    defguard is_login_error(value) when value === :invalid_user_or_password
+    defguard is_login_error(value) when value === :invalid_data or value === :invalid_user_or_password
 
     @spec from_string!(String.t()) :: t()
+    def from_string!("invalid_data"), do: :invalid_data
     def from_string!("invalid_user_or_password"), do: :invalid_user_or_password
 
     @spec to_string!(t()) :: String.t()
+    def to_string!(:invalid_data), do: "invalid_data"
     def to_string!(:invalid_user_or_password), do: "invalid_user_or_password"
 
     @spec from_json!(String.t()) :: t()
+    def from_json!("invalid_data"), do: :invalid_data
     def from_json!("invalid_user_or_password"), do: :invalid_user_or_password
 
     @spec to_json!(t()) :: String.t()
+    def to_json!(:invalid_data), do: "invalid_data"
     def to_json!(:invalid_user_or_password), do: "invalid_user_or_password"
 
   end
@@ -262,11 +266,12 @@ defmodule WebProtocol do
 
   defmodule ClickhouseInstanceError do
 
-    @type t :: :invalid_code | :invalid_name | :invalid_uri | :invalid_username | :invalid_password | :code_already_exists | :name_already_exists
+    @type t :: :invalid_data | :invalid_code | :invalid_name | :invalid_uri | :invalid_username | :invalid_password | :code_already_exists | :name_already_exists
 
-    defguard is_clickhouse_instance_error(value) when value === :invalid_code or value === :invalid_name or value === :invalid_uri or value === :invalid_username or value === :invalid_password or value === :code_already_exists or value === :name_already_exists
+    defguard is_clickhouse_instance_error(value) when value === :invalid_data or value === :invalid_code or value === :invalid_name or value === :invalid_uri or value === :invalid_username or value === :invalid_password or value === :code_already_exists or value === :name_already_exists
 
     @spec from_string!(String.t()) :: t()
+    def from_string!("invalid_data"), do: :invalid_data
     def from_string!("invalid_code"), do: :invalid_code
     def from_string!("invalid_name"), do: :invalid_name
     def from_string!("invalid_uri"), do: :invalid_uri
@@ -276,6 +281,7 @@ defmodule WebProtocol do
     def from_string!("name_already_exists"), do: :name_already_exists
 
     @spec to_string!(t()) :: String.t()
+    def to_string!(:invalid_data), do: "invalid_data"
     def to_string!(:invalid_code), do: "invalid_code"
     def to_string!(:invalid_name), do: "invalid_name"
     def to_string!(:invalid_uri), do: "invalid_uri"
@@ -285,6 +291,7 @@ defmodule WebProtocol do
     def to_string!(:name_already_exists), do: "name_already_exists"
 
     @spec from_json!(String.t()) :: t()
+    def from_json!("invalid_data"), do: :invalid_data
     def from_json!("invalid_code"), do: :invalid_code
     def from_json!("invalid_name"), do: :invalid_name
     def from_json!("invalid_uri"), do: :invalid_uri
@@ -294,6 +301,7 @@ defmodule WebProtocol do
     def from_json!("name_already_exists"), do: :name_already_exists
 
     @spec to_json!(t()) :: String.t()
+    def to_json!(:invalid_data), do: "invalid_data"
     def to_json!(:invalid_code), do: "invalid_code"
     def to_json!(:invalid_name), do: "invalid_name"
     def to_json!(:invalid_uri), do: "invalid_uri"
@@ -528,11 +536,12 @@ defmodule WebProtocol do
 
   defmodule ProjectError do
 
-    @type t :: :invalid_code | :invalid_name | :invalid_clickhouse_instance_id | :invalid_clickhouse_db | :invalid_description | :clickhouse_instance_not_exists | :code_already_exists | :name_already_exists
+    @type t :: :invalid_data | :invalid_code | :invalid_name | :invalid_clickhouse_instance_id | :invalid_clickhouse_db | :invalid_description | :clickhouse_instance_not_exists | :code_already_exists | :name_already_exists
 
-    defguard is_project_error(value) when value === :invalid_code or value === :invalid_name or value === :invalid_clickhouse_instance_id or value === :invalid_clickhouse_db or value === :invalid_description or value === :clickhouse_instance_not_exists or value === :code_already_exists or value === :name_already_exists
+    defguard is_project_error(value) when value === :invalid_data or value === :invalid_code or value === :invalid_name or value === :invalid_clickhouse_instance_id or value === :invalid_clickhouse_db or value === :invalid_description or value === :clickhouse_instance_not_exists or value === :code_already_exists or value === :name_already_exists
 
     @spec from_string!(String.t()) :: t()
+    def from_string!("invalid_data"), do: :invalid_data
     def from_string!("invalid_code"), do: :invalid_code
     def from_string!("invalid_name"), do: :invalid_name
     def from_string!("invalid_clickhouse_instance_id"), do: :invalid_clickhouse_instance_id
@@ -543,6 +552,7 @@ defmodule WebProtocol do
     def from_string!("name_already_exists"), do: :name_already_exists
 
     @spec to_string!(t()) :: String.t()
+    def to_string!(:invalid_data), do: "invalid_data"
     def to_string!(:invalid_code), do: "invalid_code"
     def to_string!(:invalid_name), do: "invalid_name"
     def to_string!(:invalid_clickhouse_instance_id), do: "invalid_clickhouse_instance_id"
@@ -553,6 +563,7 @@ defmodule WebProtocol do
     def to_string!(:name_already_exists), do: "name_already_exists"
 
     @spec from_json!(String.t()) :: t()
+    def from_json!("invalid_data"), do: :invalid_data
     def from_json!("invalid_code"), do: :invalid_code
     def from_json!("invalid_name"), do: :invalid_name
     def from_json!("invalid_clickhouse_instance_id"), do: :invalid_clickhouse_instance_id
@@ -563,6 +574,7 @@ defmodule WebProtocol do
     def from_json!("name_already_exists"), do: :name_already_exists
 
     @spec to_json!(t()) :: String.t()
+    def to_json!(:invalid_data), do: "invalid_data"
     def to_json!(:invalid_code), do: "invalid_code"
     def to_json!(:invalid_name), do: "invalid_name"
     def to_json!(:invalid_clickhouse_instance_id), do: "invalid_clickhouse_instance_id"
